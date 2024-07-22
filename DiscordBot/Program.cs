@@ -45,24 +45,34 @@ namespace DiscordBot
 
             builder.ConfigureEventHandlers(b =>
                 b.HandleMessageCreated(
-                    async (s, e) =>
-                    {
-                        string command = e.Message.Content.Substring(1);
-                        if (e.Message.Content.ToLower().StartsWith("dude"))
+                        async (s, e) =>
                         {
-                            await e.Message.RespondAsync("score!");
+                            string command = e.Message.Content.Substring(1);
+                            if (e.Message.Content.ToLower().StartsWith("dude"))
+                            {
+                                await e.Message.RespondAsync("score!");
+                            }
+                            else if (
+                                e.Message.Content.ToLower().StartsWith("!")
+                                && !commandList.Contains(command.ToLower())
+                            )
+                            {
+                                await e.Message.RespondAsync(
+                                    $"you buttmunch, {e.Message.Content} isn't a command"
+                                );
+                            }
                         }
-                        else if (
-                            e.Message.Content.ToLower().StartsWith("!")
-                            && !commandList.Contains(command.ToLower())
-                        )
+                    )
+                    .HandleVoiceStateUpdated(
+                        async (s, e) =>
                         {
-                            await e.Message.RespondAsync(
-                                $"you buttmunch, {e.Message.Content} isn't a command"
-                            );
+                            if (e.After.Channel != null)
+                            {
+                                DiscordChannel channel = e.After.Channel;
+                                VoiceNextchonnection connection = await channel.ConnectAsync;
+                            }
                         }
-                    }
-                )
+                    )
             );
 
             CommandsExtension commandsExtension = client.UseCommands(

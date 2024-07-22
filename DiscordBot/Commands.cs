@@ -76,4 +76,11 @@ namespace DiscordBot
         public static ValueTask ExecuteAsync(CommandContext context) =>
             context.RespondAsync("Hey losers. huh huh");
     }
+
+    internal class TargetUser
+    {
+        // [Command("target")]
+        // public static ValueTask ExecuteAsync(CommandContext context) =>
+        // context.RespondAsync("");
+    }
 }
