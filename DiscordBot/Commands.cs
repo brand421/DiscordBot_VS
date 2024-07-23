@@ -77,11 +77,36 @@ namespace DiscordBot
             context.RespondAsync("Hey losers. huh huh");
     }
 
+    public class TagNameAutoCompleteProvider : IAutoCompleteProvider
+    {
+        private readonly ITagService tagService;
+
+        public TagNameAutoCompleteProvider(ITagService tagService) => tagService = tagService;
+
+        public ValueTask<IReadOnlyDictionary<string, object>> AutoCompleteAsync(
+            AutoCompleteContext context
+        )
+        {
+            var tags = tagService
+                .GetTags()
+                .Where(x =>
+                    x.Name.StartsWith(context.UserInput, StringComparison.OrdinalIgnoreCase)
+                )
+                .ToDictionary(x => x.Name, x => x.Id);
+
+            return ValueTask.FromResult(tags);
+        }
+    }
+
     internal class TargetUser
     {
-        // [Command("target")]
-        // public static ValueTask ExecuteAsync(CommandContext context) =>
-        // context.RespondAsync("");
-
+        [Command("target")]
+        public async ValueTask ExecuteAsync(
+            CommandContext context,
+            [SlashAutoCompleteProvider<TagNameAutoCompleteProvider>] string tagName
+        )
+        {
+            context.RespondAsync($"{tagName} will never score");
+        }
     }
 }

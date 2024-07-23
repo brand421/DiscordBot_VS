@@ -25,7 +25,7 @@ namespace DiscordBot
             );
             DiscordClient client = builder.Build();
 
-            //client.UseVoiceNext();
+            client.UseVoiceNext();
 
             //DiscordChannel channel;
             //if (channel != null)
@@ -43,24 +43,26 @@ namespace DiscordBot
             commandList.Add("rock");
             commandList.Add("hello");
 
-            
-            builder.ConfigureEventHandlers
-            (
-                b => b.HandleMessageCreated(async (s, e) =>
-                {
-                string command = e.Message.Content.Substring(1);
-                Console.WriteLine(command);
-                if (e.Message.Content.ToLower().StartsWith("ping"))
+            builder.ConfigureEventHandlers(b =>
+                b.HandleMessageCreated(
+                    async (s, e) =>
                     {
-                        await e.Message.RespondAsync("pong!");
+                        string command = e.Message.Content.Substring(1);
+                        Console.WriteLine(command);
+                        if (e.Message.Content.ToLower().StartsWith("ping"))
+                        {
+                            await e.Message.RespondAsync("pong!");
+                        }
+                        if (e.Message.Content.StartsWith("!") && !commandList.Contains(command))
+                        {
+                            string user = e.Author.Mention.ToString();
+                            await e.Message.RespondAsync(
+                                $"{user} you buttmunch, {command} isn't a real command"
+                            );
+                        }
                     }
-                    if (e.Message.Content.StartsWith("!") && !commandList.Contains(command))
-                    {
-                        string user = e.Author.Mention.ToString();
-                        await e.Message.RespondAsync($"{user} you buttmunch, {command} isn't a real command");
-                    }
-               })
-                );
+                )
+            );
 
             CommandsExtension commandsExtension = client.UseCommands(
                 new CommandsConfiguration()
