@@ -25,7 +25,7 @@ namespace DiscordBot
             );
             DiscordClient client = builder.Build();
 
-            client.UseVoiceNext();
+            //client.UseVoiceNext();
 
             //DiscordChannel channel;
             //if (channel != null)
@@ -43,37 +43,24 @@ namespace DiscordBot
             commandList.Add("rock");
             commandList.Add("hello");
 
-            builder.ConfigureEventHandlers(b =>
-                b.HandleMessageCreated(
-                        async (s, e) =>
-                        {
-                            string command = e.Message.Content.Substring(1);
-                            if (e.Message.Content.ToLower().StartsWith("dude"))
-                            {
-                                await e.Message.RespondAsync("score!");
-                            }
-                            else if (
-                                e.Message.Content.ToLower().StartsWith("!")
-                                && !commandList.Contains(command.ToLower())
-                            )
-                            {
-                                await e.Message.RespondAsync(
-                                    $"you buttmunch, {e.Message.Content} isn't a command"
-                                );
-                            }
-                        }
-                    )
-                    .HandleVoiceStateUpdated(
-                        async (s, e) =>
-                        {
-                            if (e.After.Channel != null)
-                            {
-                                DiscordChannel channel = e.After.Channel;
-                                VoiceNextchonnection connection = await channel.ConnectAsync;
-                            }
-                        }
-                    )
-            );
+            
+            builder.ConfigureEventHandlers
+            (
+                b => b.HandleMessageCreated(async (s, e) =>
+                {
+                string command = e.Message.Content.Substring(1);
+                Console.WriteLine(command);
+                if (e.Message.Content.ToLower().StartsWith("ping"))
+                    {
+                        await e.Message.RespondAsync("pong!");
+                    }
+                    if (e.Message.Content.StartsWith("!") && !commandList.Contains(command))
+                    {
+                        string user = e.Author.Mention.ToString();
+                        await e.Message.RespondAsync($"{user} you buttmunch, {command} isn't a real command");
+                    }
+               })
+                );
 
             CommandsExtension commandsExtension = client.UseCommands(
                 new CommandsConfiguration()
@@ -82,21 +69,6 @@ namespace DiscordBot
                     UseDefaultCommandErrorHandler = false
                 }
             );
-
-            // commandsExtension.CommandErrored += async (s, e) =>
-            // {
-            //     StringBuilder stringBuilder = new();
-            //     stringBuilder.Append("You buttmunch, ");
-            //     stringBuilder.Append(e.Exception.GetType().Name);
-            //     stringBuilder.Append(" doesn't exist");
-            //     stringBuilder.Append(
-            //         DSharpPlus.Formatter.InlineCode(
-            //             DSharpPlus.Formatter.Sanitize(e.Exception.Message)
-            //         )
-            //     );
-
-            //     await eventArgs.Context.RespondAsync(stringBuilder);
-            // };
 
             commandsExtension.AddCommands(typeof(Program).Assembly);
             TextCommandProcessor textCommandProcessor =
@@ -115,7 +87,7 @@ namespace DiscordBot
 
             DiscordActivity status = new("trying to score", DiscordActivityType.Custom);
 
-            await client.ConnectAsync(status, DiscordUserStatus.Online);
+            await builder.ConnectAsync();
             await Task.Delay(-1);
         }
     }
