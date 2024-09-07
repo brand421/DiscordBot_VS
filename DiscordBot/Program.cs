@@ -17,8 +17,12 @@ namespace DiscordBot
     {
         static async Task Main(string[] args)
         {
+
+            var configBuild = new ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory()).AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
+            IConfiguration config = configBuild.Build();
+            
             DiscordClientBuilder builder = DiscordClientBuilder.CreateDefault(
-                "MTI2MDI0OTgwMDM0ODAwODQ1OA.Gl_tlt.-y50U7e_9PPDv0v1232EQ0OxTNkkSogCngmo_I",
+                config.GetValue<string>("DiscordToken"),
                 DiscordIntents.AllUnprivileged
                     | DiscordIntents.MessageContents
                     | DiscordIntents.GuildVoiceStates
